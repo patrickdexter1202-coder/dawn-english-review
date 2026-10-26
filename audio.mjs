@@ -1,5 +1,5 @@
 let generation=0,current,timer,sequence=null;
-function stopCurrent(){generation++;clearTimeout(timer);if(current){current.pause();current.removeAttribute('src');current.load();current=null;}window.speechSynthesis?.cancel();}
+function stopCurrent(){generation++;clearTimeout(timer);if(current){const previous=current;current=null;for(const action of [()=>previous.pause(),()=>previous.removeAttribute('src'),()=>previous.load()])try{action();}catch{}}try{window.speechSynthesis?.cancel();}catch{}}
 export function stopAudio(){sequence=null;stopCurrent();}
 function play(text,rate,onEnd,onError){stopCurrent();const token=generation;let local=false,ended=false;
  const done=()=>{if(token!==generation||ended)return;ended=true;clearTimeout(timer);onEnd();};
