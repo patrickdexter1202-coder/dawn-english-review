@@ -3,3 +3,15 @@ export function grade(q,answer){if(q.segments?.length){const values=Array.isArra
 export function stats(attempts=[]){const result={};for(const a of attempts){const s=result[a.questionId]??={attempts:0,wrong:0,streak:0,assisted:0};s.attempts++;if(a.assisted)s.assisted++;if(!a.correct){s.wrong++;s.streak=0;}else if(!a.assisted)s.streak++;else s.streak=0;s.last=a.at;s.active=(s.wrong>0||s.assisted>0)&&s.streak<3;}return result;}
 export function plan(pool,attempts=[],size=20,all=false){const s=stats(attempts);for(const q of pool)if(q.segments?.length){const parts=q.segments.map(p=>s[q.id+'::'+p.id]);s[q.id]=parts.every(Boolean)?{active:parts.some(p=>p.active),wrong:parts.reduce((a,p)=>a+p.wrong,0)}:parts.some(p=>p?.active)?{active:true,wrong:parts.reduce((a,p)=>a+(p?.wrong||0),0)}:undefined;}return [...pool].sort(()=>Math.random()-.5).filter(q=>all||!s[q.id]||s[q.id].active).sort((a,b)=>((s[b.id]?.active?100:0)+(s[b.id]?.wrong||0))-((s[a.id]?.active?100:0)+(s[a.id]?.wrong||0))).slice(0,size);}
 export function expandPlan(groups){return groups.flatMap(q=>q.segments?.length?q.segments.map((s,i)=>({...q,...s,id:q.id+'::'+s.id,groupId:q.id,compound:true,segmentIndex:i,segmentTotal:q.segments.length,groupSegments:q.segments,segments:null,phonetic:''})):q);}
+// Keep word boundaries and punctuation. Never expose all letters of a multi-letter word.
+export function makeHint(answer,difficulty='medium'){
+ const level=['easy','medium','hard'].includes(difficulty)?difficulty:'medium';
+ return String(answer).split(/\s+/).map(word=>{
+  const letters=[...word],indexes=letters.map((c,i)=>/[a-z]/i.test(c)?i:-1).filter(i=>i>=0),n=indexes.length;
+  const count=n<=1?n:Math.min(n-1,level==='easy'?Math.max(1,Math.ceil(n*.6)):level==='medium'?Math.max(1,Math.ceil(n*.3)):1);
+  // P09 reveals the word ends; easy additionally places evenly spaced middle letters.
+  const show=new Set(count===1?[indexes[0]]:Array.from({length:count},(_,i)=>indexes[Math.round(i*(n-1)/(count-1))]));
+  return letters.map((c,i)=>/[a-z]/i.test(c)&&!show.has(i)?'_':c).join(' ');
+ }).join('   ');
+}
+export function roundSummary(round=[],planned=round.length){const independent=round.filter(a=>a.correct&&!a.assisted).length,assisted=round.filter(a=>a.assisted).length,wrong=round.filter(a=>!a.correct).length;return {planned,completed:round.length,unanswered:Math.max(0,planned-round.length),independent,assisted,wrong,reinforce:round.length-independent};}
