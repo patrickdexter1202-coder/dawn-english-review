@@ -22,6 +22,8 @@
 .study-body .meaning-label{font:600 14px/1.5 system-ui,sans-serif;color:var(--soft);margin:10px 0 8px}.study-body .task-title{margin-bottom:18px}.word-meaning-help{margin:8px 0}.study-body .word-meaning-help .text-button{font-size:15px;padding:8px 0}.word-meaning-list{list-style:none;padding:0;margin:8px 0;max-height:240px;overflow:auto;font:14px/1.65 system-ui,sans-serif}.word-meaning-list li{display:grid;grid-template-columns:50px minmax(0,1fr);gap:4px 8px;padding:9px 0;border-bottom:1px solid var(--line)}.word-meaning-list li>span{color:var(--soft);font-size:12px}.word-meaning-list b{font-weight:400;overflow-wrap:anywhere}.word-meaning-list small{grid-column:2;font-size:11px;color:var(--soft)}.word-meaning-help .fineprint{font:12px/1.6 system-ui,sans-serif;margin:8px 0}
 
 .record-delete-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0}.record-delete-tools small{font:13px/1.6 system-ui,sans-serif;color:var(--soft)}.study-body .delete-session{color:#974228;margin:14px 0 0}.study-body #audio-system{min-height:52px}.study-body .audio-row{gap:12px}
+.study-body #answer-form .audio-row{justify-content:flex-start;margin:12px 0}.study-body .audio-row .button.circle{padding-left:16px;padding-right:16px}
+@media(max-width:540px){.study-body .audio-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.study-body .audio-row .button{width:100%;min-width:0;padding:10px 8px;font-size:16px}.study-body .audio-row label{grid-column:1/-1;justify-content:center}}
 /* Use the visible viewport (Safari browser chrome / keyboard included). Long
    materials scroll inside the card; the reading/answer controls stay in view. */
 @media(min-width:900px) and (orientation:landscape) and (max-height:1100px){

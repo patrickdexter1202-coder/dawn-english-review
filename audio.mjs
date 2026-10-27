@@ -7,15 +7,15 @@ export function stopAudio(){sequence=null;stopCurrent();}
 function systemSequence(texts,rate,id,onStep,onError){
  const token=generation,synth=window.speechSynthesis;
  const fail=message=>{if(token!==generation||sequence!==id)return;stopAudio();onStep(-1);onError(message);};
- if(!synth||!window.SpeechSynthesisUtterance){fail('当前设备没有可用的系统语音，请尝试普通朗读。');return;}
+ if(!synth||!window.SpeechSynthesisUtterance){fail('当前设备没有可用的系统语音，请尝试有道语音。');return;}
  try{const voice=(synth.getVoices?.()||[]).find(v=>String(v.lang).replace('_','-').toLowerCase()==='en-us');
   utterances=texts.map((text,i)=>{const u=new window.SpeechSynthesisUtterance(text);u.lang='en-US';if(voice)u.voice=voice;u.rate=rate;
    u.onstart=()=>{if(token!==generation||sequence!==id)return;clearTimeout(timer);onStep(i);};
-   u.onend=()=>{if(token!==generation||sequence!==id)return;clearTimeout(timer);if(i===texts.length-1){sequence=null;utterances=[];onStep(-1);}else timer=setTimeout(()=>fail('系统朗读未继续，请再次点击备用朗读。'),6000);};
+   u.onend=()=>{if(token!==generation||sequence!==id)return;clearTimeout(timer);if(i===texts.length-1){sequence=null;utterances=[];onStep(-1);}else timer=setTimeout(()=>fail('系统朗读未继续，请再次点击系统语音。'),6000);};
    u.onerror=()=>fail('系统语音播放失败，请检查设备音量和英语（美国）语音后重试。');return u;});
-  onStep(0);timer=setTimeout(()=>fail('系统语音未启动，请检查音量和英语（美国）语音后再次点击朗读。'),6000);
+  onStep(0);timer=setTimeout(()=>fail('系统语音未启动，请检查音量和英语（美国）语音后再次点击系统语音。'),6000);
   for(const u of utterances)synth.speak(u);
- }catch{fail('系统语音无法启动，请点击「备用朗读」重试。');}
+ }catch{fail('系统语音无法启动，请点击「系统语音」重试。');}
 }
 export function speak(text,rate=1,onError=()=>{}){speakSequence([text],rate,()=>{},onError);}
 export function speakSequence(texts,rate=1,onStep=()=>{},onError=()=>{},options={}){
@@ -29,7 +29,7 @@ export function speakSequence(texts,rate=1,onStep=()=>{},onError=()=>{},options=
  const next=()=>{if(sequence!==id)return;if(index>=clips.length){sequence=null;onStep(-1);return;}
   const clip=clips[index++],at=clip.part;if(index===1||clips[index-2].part!==at)onStep(at);const token=generation;let local=false,ended=false;
   const done=()=>{if(token!==generation||ended||sequence!==id)return;ended=true;clearTimeout(timer);next();};
-  const fallback=()=>{if(token!==generation||local||ended||sequence!==id)return;local=true;clearTimeout(timer);try{player?.pause();}catch{}options.onStatus?.('有道音频暂不可用，尝试系统语音；无声时请点击备用朗读。');systemSequence(texts.slice(at),rate,id,i=>onStep(i<0?-1:at+i),onError);};
+  const fallback=()=>{if(token!==generation||local||ended||sequence!==id)return;local=true;clearTimeout(timer);try{player?.pause();}catch{}options.onStatus?.('有道音频暂不可用，尝试系统语音；无声时请点击系统语音。');systemSequence(texts.slice(at),rate,id,i=>onStep(i<0?-1:at+i),onError);};
   if(clip.system){fallback();return;}
   try{const url=clip.url;
    // Keep the player unlocked by the initial tap for the whole sequence.
